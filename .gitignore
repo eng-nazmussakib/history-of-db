@@ -1,0 +1,9 @@
+# Wikidata / Wikipedia response cache for the seed generators
+.cache/
+
+# Environment files (.env, .env.local, .env.development, .env.production, …)
+# stay on your machine. Only the documented example is committed.
+.env*
+!.env.local.example
+
+.DS_Store
