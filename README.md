@@ -99,3 +99,26 @@ WHERE t.slug = 'japan'
 GROUP BY e.id
 ORDER BY e.sort_key;
 ```
+
+## Next Plans
+
+In rough order. Feature IDs point to `docs/FEATURES.md` in the `history-of-app` repository.
+
+**1. Fill gaps in the country data (F-06)**
+- Find events for the five countries with none: Bahamas, Barbados, Samoa, Tuvalu and Zambia (lower the popularity threshold or add their `P793` events by hand through an override list).
+- Bring back shipwrecks: query that event type in smaller batches instead of skipping it.
+- Correct wrong Wikidata dates (e.g. Convention of Kanagawa: 1854, not 1864) with a date-override table in `fetch-country-events.mjs`, so fixes survive regeneration.
+
+**2. More term types (F-12)**
+- New seeds after `002_…`: empires and dynasties, major wars and revolutions as terms of their own, then people, inventions and ideas. Each gets a fetch script and a seed list; the schema already supports them through `term_type`.
+- Link existing country events to the new terms (e.g. *Battle of Waterloo* → `Napoleonic Wars`).
+
+**3. Scheduled crawler (F-13)**
+- Replace the one-off seed scripts with a job that re-crawls terms by staleness and priority, writes each run to `crawl_jobs` and updates `terms.last_crawled_at`.
+- Queue the most requested missing terms from `term_requests` (filled by the app's search misses).
+- More sources: Wikipedia "Timeline of X" and "History of X" articles, and year pages.
+- Still to decide: Node or Python, and where it runs (cron or GitHub Actions).
+
+**4. Hosting**
+- Run `neon/setup.sh` from CI instead of by hand, and trigger the app's on-demand revalidation after each re-seed so cached timelines pick up the new data.
+- Speed up remote seeding (about 5 minutes today), e.g. by loading the generated seeds in one transaction or with `COPY`.
